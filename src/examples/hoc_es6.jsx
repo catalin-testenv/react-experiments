@@ -71,8 +71,9 @@ class Example extends React.Component {
     }
 
     static get defaultProps () {
-        // using `super` just as a good practice
-        // in case we decide that this Component should inherit from another custom Component
+        // Using `super` her just as a good practice.
+        // It has nothing to do with the decoration process.
+        // We use it just in case we decide that this Component should inherit from another custom Component.
         return Object.assign({}, super.defaultProps, {
             message: 'Default message'
         })
