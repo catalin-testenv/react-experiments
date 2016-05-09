@@ -26103,6 +26103,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var React = require('react');
 var ReactDOM = require('react-dom');
 var DropDownButton = require('../components/drop_down_button/DropDownButton');
+var Service = require('../services/service');
 
 var Example = function (_React$Component) {
     _inherits(Example, _React$Component);
@@ -26119,17 +26120,28 @@ var Example = function (_React$Component) {
         var _this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Example)).call.apply(_Object$getPrototypeO, [this].concat(args)));
 
         _this.state = {
+            actions: {},
             currentAction: 'action_one'
         };
         _this._onButtonAction = _this._onButtonAction.bind(_this);
+        _this._onActionsReceived = _this._onActionsReceived.bind(_this);
+        Service.getData('/data/buttonActions.json', 1000, _this._onActionsReceived);
         return _this;
     }
 
     _createClass(Example, [{
         key: '_onButtonAction',
         value: function _onButtonAction(action) {
+            console.log(action);
             this.setState({
                 currentAction: action
+            });
+        }
+    }, {
+        key: '_onActionsReceived',
+        value: function _onActionsReceived(actions) {
+            this.setState({
+                actions: actions
             });
         }
     }, {
@@ -26139,7 +26151,7 @@ var Example = function (_React$Component) {
                 'div',
                 null,
                 React.createElement(DropDownButton, {
-                    actions: { action_one: 'Action One', action_two: 'Action Two' },
+                    actions: this.state.actions,
                     selected: this.state.currentAction,
                     onAction: this._onButtonAction })
             );
@@ -26153,4 +26165,28 @@ module.exports = function () {
     ReactDOM.render(React.createElement(Example, null), document.getElementById('main'));
 };
 
-},{"../components/drop_down_button/DropDownButton":463,"react":461,"react-dom":325}]},{},[462]);
+},{"../components/drop_down_button/DropDownButton":463,"../services/service":465,"react":461,"react-dom":325}],465:[function(require,module,exports){
+'use strict';
+
+var Service = {
+    getData: function getData(url, delay, callback) {
+        var _this = this;
+
+        setTimeout(function () {
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                cache: false,
+                success: function (data) {
+                    callback(data);
+                }.bind(_this),
+                error: function (xhr, status, err) {
+                    console.error(url, status, err.toString());
+                }.bind(_this)
+            });
+        }, delay);
+    }
+};
+module.exports = Service;
+
+},{}]},{},[462]);

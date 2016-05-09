@@ -3,20 +3,31 @@
 const React = require( 'react' )
 const ReactDOM = require( 'react-dom' )
 const DropDownButton = require( '../components/drop_down_button/DropDownButton' )
+const Service = require( '../services/service' )
 
 class Example extends React.Component {
     
     constructor(...args) {
         super(...args)
         this.state = {
+            actions: {},
             currentAction: 'action_one'
         }
         this._onButtonAction = this._onButtonAction.bind(this)
+        this._onActionsReceived = this._onActionsReceived.bind(this)
+        Service.getData('/data/buttonActions.json', 1000, this._onActionsReceived)
     }
     
     _onButtonAction(action) {
+        console.log(action)
         this.setState({
             currentAction: action
+        })
+    }
+    
+    _onActionsReceived (actions) {
+        this.setState({
+            actions: actions
         })
     }
     
@@ -24,7 +35,7 @@ class Example extends React.Component {
         return (
             <div>
                 <DropDownButton 
-                    actions={{action_one: 'Action One', action_two: 'Action Two'}} 
+                    actions={this.state.actions} 
                     selected={this.state.currentAction} 
                     onAction={this._onButtonAction} />
             </div>
