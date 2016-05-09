@@ -26071,7 +26071,7 @@ var DropDownButton = function (_React$Component) {
                 React.createElement(
                     'button',
                     { onClick: this.handleButtonOnClick, className: 'btn btn-default dropdown-toggle', type: 'button' },
-                    actions[selected] || 'Actions',
+                    actions[selected] || '...',
                     ' ',
                     React.createElement('span', { className: 'caret' })
                 ),
@@ -26125,7 +26125,11 @@ var Example = function (_React$Component) {
         };
         _this._onButtonAction = _this._onButtonAction.bind(_this);
         _this._onActionsReceived = _this._onActionsReceived.bind(_this);
-        Service.getData('/data/buttonActions.json', 1000, _this._onActionsReceived);
+        Service.getData('/data/buttonActions.json', 1000).then(function (data) {
+            _this._onActionsReceived(data);
+        }).catch(function (url, status, err) {
+            console.log(err);
+        });
         return _this;
     }
 
@@ -26169,22 +26173,22 @@ module.exports = function () {
 'use strict';
 
 var Service = {
-    getData: function getData(url, delay, callback) {
-        var _this = this;
-
-        setTimeout(function () {
-            $.ajax({
-                url: url,
-                dataType: 'json',
-                cache: false,
-                success: function (data) {
-                    callback(data);
-                }.bind(_this),
-                error: function (xhr, status, err) {
-                    console.error(url, status, err.toString());
-                }.bind(_this)
-            });
-        }, delay);
+    getData: function getData(url, delay) {
+        return new Promise(function (resolve, reject) {
+            setTimeout(function () {
+                $.ajax({
+                    url: url,
+                    dataType: 'json',
+                    cache: false,
+                    success: function success(data) {
+                        resolve(data);
+                    },
+                    error: function error(xhr, status, err) {
+                        reject(url, status, err.toString());
+                    }
+                });
+            }, delay);
+        });
     }
 };
 module.exports = Service;

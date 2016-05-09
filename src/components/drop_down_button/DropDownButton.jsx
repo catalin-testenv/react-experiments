@@ -69,7 +69,7 @@ class DropDownButton extends React.Component {
         return(
             <div className={`${className} dropdown`} { ...rest }>
                 <button onClick={ this.handleButtonOnClick } className="btn btn-default dropdown-toggle" type="button">
-                    { actions[selected] || 'Actions' } <span className="caret"></span>
+                    { actions[selected] || '...' } <span className="caret"></span>
                 </button>
                 <ul className="dropdown-menu" style={ { display: this.state.opened ? 'block' : 'none' } }>
                     { children }

@@ -15,7 +15,14 @@ class Example extends React.Component {
         }
         this._onButtonAction = this._onButtonAction.bind(this)
         this._onActionsReceived = this._onActionsReceived.bind(this)
-        Service.getData('/data/buttonActions.json', 1000, this._onActionsReceived)
+        Service
+        .getData('/data/buttonActions.json', 1000)
+        .then((data) => {
+            this._onActionsReceived (data)
+        })
+        .catch((url, status, err) => {
+            console.log(err)
+        })
     }
     
     _onButtonAction(action) {
