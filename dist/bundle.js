@@ -25947,18 +25947,152 @@ module.exports = require('./lib/React');
 
 require('babel-polyfill');
 
-require('./examples/hoc_es6')();
+// require('./examples/hoc_es6')()
+require('./examples/basics')();
 
-},{"./examples/hoc_es6":463,"babel-polyfill":1}],463:[function(require,module,exports){
+},{"./examples/basics":464,"babel-polyfill":1}],463:[function(require,module,exports){
 'use strict';
 
-// NOTE:
-// This demo uses standard JavaScript (precisely: EcmaScript_2015/ES6)
-// After transpiling back to ES5 (using Babel), this demo is still compatible with IE9
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+
+var DropDownButton = function (_React$Component) {
+    _inherits(DropDownButton, _React$Component);
+
+    _createClass(DropDownButton, null, [{
+        key: 'propTypes',
+        get: function get() {
+            return {
+                onAction: React.PropTypes.func.isRequired,
+                actions: React.PropTypes.object.isRequired,
+                selected: React.PropTypes.string.isRequired
+            };
+        }
+    }]);
+
+    function DropDownButton() {
+        var _Object$getPrototypeO;
+
+        _classCallCheck(this, DropDownButton);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        var _this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(DropDownButton)).call.apply(_Object$getPrototypeO, [this].concat(args)));
+
+        _this.toggle = _this.toggle.bind(_this);
+        _this.toggleOff = _this.toggleOff.bind(_this);
+        _this.handleButtonOnClick = _this.handleButtonOnClick.bind(_this);
+        _this.handleLinkOnClick = _this.handleLinkOnClick.bind(_this);
+        _this.state = {
+            opened: false
+        };
+        return _this;
+    }
+
+    _createClass(DropDownButton, [{
+        key: 'toggle',
+        value: function toggle() {
+            this.setState({
+                opened: !this.state.opened
+            });
+        }
+    }, {
+        key: 'toggleOff',
+        value: function toggleOff() {
+            this.state.opened && this.setState({
+                opened: false
+            });
+        }
+    }, {
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            window.addEventListener('click', this.toggleOff);
+        }
+    }, {
+        key: 'componentWillUnmount',
+        value: function componentWillUnmount() {
+            window.removeEventListener('click', this.toggleOff);
+        }
+    }, {
+        key: 'handleButtonOnClick',
+        value: function handleButtonOnClick(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggle();
+        }
+    }, {
+        key: 'handleLinkOnClick',
+        value: function handleLinkOnClick(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggle();
+            this.props.onAction(e.target.dataset.action);
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            var _props = this.props;
+            var actions = _props.actions;
+            var selected = _props.selected;
+            var onAction = _props.onAction;
+            var className = _props.className;
+
+            var rest = _objectWithoutProperties(_props, ['actions', 'selected', 'onAction', 'className']);
+
+            var children = Object.keys(actions).map(function (action) {
+                return React.createElement(
+                    'li',
+                    { key: action },
+                    React.createElement(
+                        'a',
+                        { onClick: _this2.handleLinkOnClick, 'data-action': action, href: '#' },
+                        actions[action]
+                    )
+                );
+            });
+            return React.createElement(
+                'div',
+                _extends({ className: className + ' dropdown' }, rest),
+                React.createElement(
+                    'button',
+                    { onClick: this.handleButtonOnClick, className: 'btn btn-default dropdown-toggle', type: 'button' },
+                    actions[selected] || 'Actions',
+                    ' ',
+                    React.createElement('span', { className: 'caret' })
+                ),
+                React.createElement(
+                    'ul',
+                    { className: 'dropdown-menu', style: { display: this.state.opened ? 'block' : 'none' } },
+                    children
+                )
+            );
+        }
+    }]);
+
+    return DropDownButton;
+}(React.Component);
+
+module.exports = DropDownButton;
+
+},{"react":461}],464:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -25968,97 +26102,35 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-var copyProperties = require('../lib/utils').copyProperties;
-
-// custom validator
-function allowOnlyChildrenOfType() {
-    for (var _len = arguments.length, allowedTypes = Array(_len), _key = 0; _key < _len; _key++) {
-        allowedTypes[_key] = arguments[_key];
-    }
-
-    return function allowOnlyChildrenOfType(props, propName, componentName) {
-        var possibleError = null;
-
-        React.Children.toArray(props[propName]).forEach(function (child) {
-            if (allowedTypes.indexOf(child.type) === -1) {
-                possibleError = new Error(componentName + ' should have children of the following types: ' + allowedTypes.join(', ') + '. Offending child: ' + child.type);
-            }
-        });
-
-        return possibleError;
-    };
-}
-
-// decorator (HOC)
-// receives a Class and returns another Class inheriting from the received one + adding some overrides
-function MetaDeco(Component) {
-
-    // purpose: do extra stuff on componentDidMount
-    var Extended = function (_Component) {
-        _inherits(Extended, _Component);
-
-        function Extended() {
-            var _Object$getPrototypeO;
-
-            _classCallCheck(this, Extended);
-
-            for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                args[_key2] = arguments[_key2];
-            }
-
-            return _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Extended)).call.apply(_Object$getPrototypeO, [this].concat(args)));
-        }
-
-        _createClass(Extended, [{
-            key: 'componentDidMount',
-            value: function componentDidMount() {
-                console.log('Running MetaDeco specific task on componentDidMount');
-                // let original Component do its job if any
-                _get(Object.getPrototypeOf(Extended.prototype), 'componentDidMount', this) && _get(Object.getPrototypeOf(Extended.prototype), 'componentDidMount', this).call(this);
-            }
-        }]);
-
-        return Extended;
-    }(Component);
-
-    // purpose: relocate/define propTypes
-    if (!((Component.ixMeta || {}).validations || {}).propTypes) {
-        console.warn('ixMeta.validations.propTypes is required');
-    } else {
-        // pass over propTypes - without touching original
-        Extended.propTypes = Component.ixMeta.validations.propTypes;
-    }
-
-    // for IE < 11 (this is not transpiler fault !!!)
-    // makes possible the inheritance of static Function/Class properties
-    // because IE < 11 is not aware of `Object.setPrototypeOf()` or `obj.__proto__`
-    // which are in charge of static properties inheritance during transpiling
-    // We care of this because we have statics like: displayName, defaultProps ...
-    // ... inspired from Radium module
-    copyProperties(Component, Extended);
-
-    return Extended;
-}
-
-// React Component (ES6 style) https://facebook.github.io/react/docs/reusable-components.html#es6-classes
-// Native decorators (like @MetaDeco below), a relatively new proposal for standardization
-// previously supported in Babel 5,
-// can be enabled in Babel 6 via https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy
-// @MetaDeco // ... example of native decorator usage
+var DropDownButton = require('../components/drop_down_button/DropDownButton');
 
 var Example = function (_React$Component) {
     _inherits(Example, _React$Component);
 
     function Example() {
+        var _Object$getPrototypeO;
+
         _classCallCheck(this, Example);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(Example).apply(this, arguments));
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        var _this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Example)).call.apply(_Object$getPrototypeO, [this].concat(args)));
+
+        _this.state = {
+            currentAction: 'action_one'
+        };
+        _this._onButtonAction = _this._onButtonAction.bind(_this);
+        return _this;
     }
 
     _createClass(Example, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            console.log('Running Component specific task on componentDidMount');
+        key: '_onButtonAction',
+        value: function _onButtonAction(action) {
+            this.setState({
+                currentAction: action
+            });
         }
     }, {
         key: 'render',
@@ -26066,88 +26138,19 @@ var Example = function (_React$Component) {
             return React.createElement(
                 'div',
                 null,
-                React.createElement(
-                    'h4',
-                    null,
-                    this.props.message
-                ),
-                React.createElement(
-                    'div',
-                    null,
-                    this.props.children
-                )
+                React.createElement(DropDownButton, {
+                    actions: { action_one: 'Action One', action_two: 'Action Two' },
+                    selected: this.state.currentAction,
+                    onAction: this._onButtonAction })
             );
-        }
-    }], [{
-        key: 'displayName',
-        get: function get() {
-            return 'Awesome_ES6_Component';
-        }
-    }, {
-        key: 'defaultProps',
-        get: function get() {
-            // Using `super` her just as a good practice.
-            // It has nothing to do with the decoration process.
-            // We use it just in case we decide that this Component should inherit from another custom Component.
-            return Object.assign({}, _get(Object.getPrototypeOf(Example), 'defaultProps', this), {
-                message: 'Default message'
-            });
-        }
-    }, {
-        key: 'ixMeta',
-        get: function get() {
-            return {
-                doc: 'Documentation stuff',
-                validations: {
-                    propTypes: {
-                        message: React.PropTypes.string.isRequired,
-                        children: allowOnlyChildrenOfType('p', 'div')
-                    }
-                }
-            };
         }
     }]);
 
     return Example;
 }(React.Component);
 
-// applying decoration on component
-// as @MetaDeco - syntactic sugar - is not standard yet in JS,
-// we apply the decoration by explicitly wrapping the Component
-
-
-Example = MetaDeco(Example);
-
 module.exports = function () {
-    ReactDOM.render(React.createElement(
-        Example,
-        null,
-        React.createElement(
-            'p',
-            null,
-            'child paragraph'
-        ),
-        React.createElement(
-            'span',
-            null,
-            'child div'
-        )
-    ), document.getElementById('main'));
+    ReactDOM.render(React.createElement(Example, null), document.getElementById('main'));
 };
 
-},{"../lib/utils":464,"react":461,"react-dom":325}],464:[function(require,module,exports){
-'use strict';
-
-// https://github.com/FormidableLabs/radium/blob/master/src/enhancer.js
-
-var KEYS_TO_IGNORE_WHEN_COPYING_PROPERTIES = ['arguments', 'callee', 'caller', 'length', 'name', 'prototype', 'type'];
-module.exports.copyProperties = function copyProperties(source, target) {
-    Object.getOwnPropertyNames(source).forEach(function (key) {
-        if (KEYS_TO_IGNORE_WHEN_COPYING_PROPERTIES.indexOf(key) < 0 && !target.hasOwnProperty(key)) {
-            var descriptor = Object.getOwnPropertyDescriptor(source, key);
-            Object.defineProperty(target, key, descriptor);
-        }
-    });
-};
-
-},{}]},{},[462]);
+},{"../components/drop_down_button/DropDownButton":463,"react":461,"react-dom":325}]},{},[462]);
