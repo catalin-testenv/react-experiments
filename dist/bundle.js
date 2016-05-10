@@ -26545,6 +26545,8 @@ require('./examples/hoc_es6_vs_create_class')();
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -26573,11 +26575,10 @@ function Deco(Component) {
         function Extended() {
             _classCallCheck(this, Extended);
 
-            // Component.call(this) //  for IE <= 10 if not using transform-es2015-classes(loose:true)
-
-            var _this = _possibleConstructorReturn(this, _Component.apply(this, arguments)); // overriding constructor
+            var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Extended).apply(this, arguments)); // overriding constructor
 
 
+            !Object.setPrototypeOf && Component.call(_this); //  only for IE <= 10 if not using babel plugin: transform-es2015-classes(loose:true)
             assert(arguments[0].initialPropType === 'initialPropType');
             assert(arguments[0].injectedPropType === 'injectedPropType');
             console.log('overriding constructor for ' + Component.displayName);
@@ -26588,13 +26589,14 @@ function Deco(Component) {
             return _this;
         }
 
-        Extended.prototype.componentDidMount = function componentDidMount() {
-            // overriding instance method
-            console.log('overriding componentDidMount for ' + Component.displayName);
-            _Component.prototype.componentDidMount && _Component.prototype.componentDidMount.call(this);
-        };
-
-        _createClass(Extended, null, [{
+        _createClass(Extended, [{
+            key: 'componentDidMount',
+            value: function componentDidMount() {
+                // overriding instance method
+                console.log('overriding componentDidMount for ' + Component.displayName);
+                _get(Object.getPrototypeOf(Extended.prototype), 'componentDidMount', this) && _get(Object.getPrototypeOf(Extended.prototype), 'componentDidMount', this).call(this);
+            }
+        }], [{
             key: 'propTypes',
             get: function get() {
                 return Object.assign({}, Component.propTypes, { // overriding propTypes
@@ -26612,7 +26614,7 @@ function Deco(Component) {
 
         return Extended;
     }(Component);
-    copyProperties(Component, Extended); // for IE <= 10
+    !Object.setPrototypeOf && copyProperties(Component, Extended); // only for IE <= 10
     return Extended;
 }
 
@@ -26654,13 +26656,15 @@ var ES6Class = function (_React$Component) {
     _inherits(ES6Class, _React$Component);
 
     function ES6Class() {
+        var _Object$getPrototypeO;
+
         _classCallCheck(this, ES6Class);
 
         for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
             args[_key] = arguments[_key];
         }
 
-        var _this2 = _possibleConstructorReturn(this, _React$Component.call.apply(_React$Component, [this].concat(args)));
+        var _this2 = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(ES6Class)).call.apply(_Object$getPrototypeO, [this].concat(args)));
 
         _this2.state = {
             initialStateKey: 'initialStateKey'
@@ -26669,19 +26673,21 @@ var ES6Class = function (_React$Component) {
         return _this2;
     }
 
-    ES6Class.prototype.componentDidMount = function componentDidMount() {
-        console.log(this.constructor.displayName + '#componentDidMount');
-    };
-
-    ES6Class.prototype.render = function render() {
-        return React.createElement(
-            'div',
-            null,
-            'ES6Class'
-        );
-    };
-
-    _createClass(ES6Class, null, [{
+    _createClass(ES6Class, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            console.log(this.constructor.displayName + '#componentDidMount');
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return React.createElement(
+                'div',
+                null,
+                'ES6Class'
+            );
+        }
+    }], [{
         key: 'displayName',
         get: function get() {
             return 'ES6Class';

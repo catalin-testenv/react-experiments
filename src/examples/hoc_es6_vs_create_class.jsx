@@ -22,7 +22,7 @@ function  Deco ( Component ) { // where Component can be either the result of Re
     const Extended = class extends Component {
         constructor() { // overriding constructor
             super(...arguments)
-            // Component.call(this) //  only for IE <= 10 if not using babel plugin: transform-es2015-classes(loose:true)
+            !Object.setPrototypeOf && Component.call(this) //  only for IE <= 10 if not using babel plugin: transform-es2015-classes(loose:true)
             assert(arguments[0].initialPropType === 'initialPropType')
             assert(arguments[0].injectedPropType === 'injectedPropType')
             console.log('overriding constructor for ' + Component.displayName)
@@ -49,7 +49,7 @@ function  Deco ( Component ) { // where Component can be either the result of Re
             super.componentDidMount && super.componentDidMount()
         }
     }
-    copyProperties(Component, Extended) // only for IE <= 10
+    !Object.setPrototypeOf && copyProperties(Component, Extended) // only for IE <= 10
     return Extended
 }
 
