@@ -3,78 +3,149 @@
 const React = require( 'react' );
 const ReactDOM = require( 'react-dom' );
 
+let c = 0;
+function generateTableData(rowsNum, colsNum) {
+    const tableData = [];
+    for (let row = 0; row < rowsNum; row++) {
+        let map = {};
+        for (let col = 0; col < colsNum; col++) {
+            map[`col-${row}-${col}-${c}`] = `val-${row}-${col}-${c}`;
+        }
+        tableData.push(map);
+        c++;
+    }
+    return tableData;
+}
 
-class Parent extends React.Component {
-    
+class App extends React.Component {
+
     constructor(props, ...args) {
         super(props, ...args);
-        this.registeredChildren = [];
-        this.selectedChild = null;
-        this.handleOnChildClick = this.handleOnChildClick.bind(this);
-    }
-    
-    registerChild(child) {
-        this.registeredChildren.push(child);
-        console.log('registeredChildren', this.registeredChildren.length);
+        this.regenerate = this.regenerate.bind(this);
+        this.state = {
+            tableData: generateTableData(props.rowsNum, props.colsNum)
+        }
     }
 
-    handleOnChildClick(child) {
-        this.selectedChild = child;
-        console.log('handleOnChildClick: found child at index', this.registeredChildren.indexOf(child), child);
-        this.forceUpdate();
+    static get propTypes() {
+        return {
+            rowsNum: React.PropTypes.number.isRequired,
+            colsNum: React.PropTypes.number.isRequired
+        }
     }
-    
-    render() {
-        const children = React.Children.map(this.props.children, (child) => {
-            console.log('render: found child at index', this.registeredChildren.indexOf(child), child.props.someProp, child);
-            return React.cloneElement(child, {
-                parent: this, // let the child know who's the parent
-                onClick: this.handleOnChildClick,
-                // style: Object.assign({}, child.props.style, this.selectedChild && {backgroundColor: child.props.idx === this.selectedChild.props.idx ? '#fff' : '#ccc'})
-                style: Object.assign({}, child.props.style, {backgroundColor: 'red'})
 
-            });
+    getChildContext() {
+        return {
+            _table: {
+                onClick: this.handleOnClick,
+            }
+        };
+    }
+
+    handleOnClick(cellIdx, rowIdx) {
+        console.log('handleOnClick', cellIdx + '/' + rowIdx);
+    }
+
+    regenerate() {
+        let start = new Date();
+        this.setState({
+            tableData: generateTableData(this.props.rowsNum, this.props.colsNum)
+        }, () => {
+            let end = new Date();
+            console.log('re-rendered in:', end - start);
         });
-        
+    }
+
+    render() {
+        console.log('App render');
+        let rows = this.state.tableData.map((row, i) => <Row key={i} idx={i} rowData={row} /> );
         return (
-            <ul>
-                {children}
-            </ul>
+            <div>
+                <button onClick={this.regenerate}>re-generate {this.props.rowsNum} * {this.props.colsNum} </button>
+                <Table>{rows}</Table>
+            </div>
         );
     }
 }
 
-class Child extends React.Component {
+App.childContextTypes = Object.assign({}, {
+    _table: React.PropTypes.object,
+});
+
+class Table extends React.Component {
+    
+    constructor(props, ...args) {
+        super(props, ...args);
+    }
+
+    render() {
+        return (
+            <table  style={{tableLayout: 'fixed', width: '100%'}}>
+                <tbody>{this.props.children}</tbody>
+            </table>
+        );
+    }
+}
+
+class Row extends React.Component {
+
+    constructor(props, ...args) {
+        super(props, ...args);
+    }
+
+    static get propTypes() {
+        return {
+            rowData: React.PropTypes.object.isRequired,
+            idx: React.PropTypes.number.isRequired
+        }
+    }
+
+    render() {
+        let rowData = this.props.rowData || [];
+        let cells = Object.keys(rowData).map((key, i) => <Cell key={i} idx={i} rowIdx={this.props.idx} textData={rowData[key]}> {i}/{this.props.idx} </Cell> );
+        return (
+            <tr>{cells}</tr>
+        );
+    }
+}
+
+class Cell extends React.Component {
 
     constructor(props, ...args) {
         super(props, ...args);
         this.onClick = this.onClick.bind(this);
     }
-    
-    componentDidMount() {
-        this.props.parent.registerChild(this);
+
+    static get propTypes() {
+        return {
+            textData: React.PropTypes.string.isRequired,
+            rowIdx: React.PropTypes.number.isRequired,
+            idx: React.PropTypes.number.isRequired
+        }
     }
-    
-    onClick(e){
-        this.props.onClick(this)
+
+    onClick() {
+        this.context._table.onClick(this.props.idx, this.props.rowIdx);
     }
 
     render() {
         return (
-            <li onClick={this.onClick} style={{cursor: 'pointer'}}>
+            <td onClick={this.onClick} style={{border: '1px solid gray', padding: '5px'}}>
+                {this.props.textData}
                 {this.props.children}
-            </li>
+            </td>
         );
     }
 }
 
+Cell.contextTypes = Object.assign({}, {
+    _table: React.PropTypes.object,
+});
+
+
+
 module.exports = function() {
     ReactDOM.render((
-        <Parent>
-            <Child idx={1}>child 1</Child>
-            <Child idx={2}>child 2</Child>
-            <Child idx={3}>child 3</Child>
-            <Child idx={4}>child 4</Child>
-        </Parent>
+        <App rowsNum={400} colsNum={10} />
     ), document.getElementById('main'));
 };

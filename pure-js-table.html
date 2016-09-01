@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Pure JS Table</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!--<link type="text/css" rel="stylesheet" href="assets/css/debug.css" />-->
+    <link type="text/css" rel="stylesheet" href="assets/css/bootstrap.css" />
+    <link type="text/css" rel="stylesheet" href="assets/css/bootstrap-theme.css" />
+    <link type="text/css" rel="stylesheet" href="assets/css/overrides.css" />
+    <link type="text/css" rel="stylesheet" href="assets/css/utils.css" />
+    <script src="assets/js/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <button onclick="createTableHtml()">re-generate 400 * 10</button>
+        <div class="col-sm-12" id="main"></div>
+    </div>
+</div>
+
+<script>
+    let c = 0;
+    function generateTableData(rowsNum, colsNum) {
+
+        const tableData = [];
+        for (let row = 0; row < rowsNum; row++) {
+            let map = {};
+            for (let col = 0; col < colsNum; col++) {
+                map[`col-${row}-${col}-${c}`] = `val-${row}-${col}-${c}`;
+            }
+            tableData.push(map);
+            c++;
+        }
+        return tableData;
+    }
+
+    function createTableHtml(){
+        let start = new Date();
+        const tableData = generateTableData(400, 10);
+        let newTable = document.createElement('table');
+        newTable.style.tableLayout = 'fixed';
+        newTable.style.width = '100%';
+        document.querySelector('#main').innerHTML = '';
+        document.querySelector('#main').appendChild(newTable);
+        for (let i = 0; i < tableData.length; i++) {
+            let rowData = tableData[i];
+            let newRow = document.createElement('tr');
+            newTable.appendChild(newRow);
+            let tdCount = 0;
+            for (let key in rowData) {
+                let textNode = document.createTextNode(rowData[key] + ' ' + tdCount + '/' + i);
+                let newCell = document.createElement('td');
+                newCell.style.border = '1px solid gray';
+                newCell.style.padding = '5px';
+                newCell.onclick = function(cellIdx, rowIdx) {
+                    console.log('onclick', cellIdx + '/' + rowIdx)
+                }.bind(null, tdCount, i);
+                newCell.appendChild(textNode);
+                newRow.appendChild(newCell);
+                tdCount++;
+            }
+        }
+        let end = new Date();
+        console.log('createTableHtml took: ', end - start);
+    }
+
+    createTableHtml();
+
+</script>
+
+</body>
+</html>
