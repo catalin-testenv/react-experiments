@@ -26028,52 +26028,137 @@ module.exports = require('./lib/React');
 
 require('babel-polyfill');
 
-// require('./examples/hoc_es6')()
-// require('./examples/basics')()
-// require('./examples/hoc_es6_vs_create_class')()
-require('./examples/override_prop_types_with_classic_react_mixin')();
+// require('./examples/hoc_es6')();
+// require('./examples/basics')();
+// require('./examples/hoc_es6_vs_create_class')();
+// require('./examples/override_prop_types_with_classic_react_mixin')();
+require('./examples/child_parent_communication')();
 
-},{"./examples/override_prop_types_with_classic_react_mixin":465,"babel-polyfill":1}],465:[function(require,module,exports){
+},{"./examples/child_parent_communication":465,"babel-polyfill":1}],465:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-function MetaData(spec) {
-    return {
-        propTypes: Object.assign({}, spec.types),
-        getDefaultProps: function getDefaultProps() {
-            return Object.assign({}, spec.defaults);
+var Parent = function (_React$Component) {
+    _inherits(Parent, _React$Component);
+
+    function Parent(props) {
+        var _Object$getPrototypeO;
+
+        _classCallCheck(this, Parent);
+
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
         }
-    };
-}
 
-var Hello = React.createClass({
-    displayName: 'Hello',
-
-    mixins: [MetaData({
-        doc: 'the doc',
-        types: {
-            foo: React.PropTypes.string.isRequired
-        },
-        defaults: {
-            foo: 'Foo Message'
-        }
-    })],
-
-    render: function render() {
-        return React.createElement(
-            'div',
-            null,
-            'Hello ',
-            this.props.foo
-        );
+        return _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Parent)).call.apply(_Object$getPrototypeO, [this, props].concat(args)));
     }
-});
+
+    // onChildClick(child, origCallback){
+    //     // origCallback && origCallback();
+    //     console.log(origCallback);
+    //     console.log(child.props.someProp);
+    // }
+
+    _createClass(Parent, [{
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            var children = React.Children.map(this.props.children, function (child) {
+                return React.cloneElement(child, {
+                    parent: _this2
+                });
+            });
+
+            return React.createElement(
+                'ul',
+                null,
+                children
+            );
+        }
+    }]);
+
+    return Parent;
+}(React.Component);
+
+var Child = function (_React$Component2) {
+    _inherits(Child, _React$Component2);
+
+    function Child(props) {
+        var _Object$getPrototypeO2;
+
+        _classCallCheck(this, Child);
+
+        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+            args[_key2 - 1] = arguments[_key2];
+        }
+
+        var _this3 = _possibleConstructorReturn(this, (_Object$getPrototypeO2 = Object.getPrototypeOf(Child)).call.apply(_Object$getPrototypeO2, [this, props].concat(args)));
+
+        _this3.onClick = _this3.onClick.bind(_this3);
+        return _this3;
+    }
+
+    _createClass(Child, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {}
+    }, {
+        key: 'onClick',
+        value: function onClick() {
+            this.props.onClick(this);
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return React.createElement(
+                'li',
+                { onClick: this.onClick, style: { cursor: 'pointer' } },
+                this.props.parent.props.propParent,
+                this.props.children
+            );
+        }
+    }]);
+
+    return Child;
+}(React.Component);
 
 module.exports = function () {
-    console.log(Object.keys(Hello.propTypes)); // ["foo"]
-    ReactDOM.render(React.createElement(Hello, null), document.getElementById('main')); // Hello Foo Message
+    ReactDOM.render(React.createElement(
+        Parent,
+        { propParent: 'test' },
+        React.createElement(
+            Child,
+            { onClick: function onClick() {
+                    console.log('child:', 1);
+                }, someProp: 1 },
+            'c1'
+        ),
+        React.createElement(
+            Child,
+            { someProp: 2 },
+            'c2'
+        ),
+        React.createElement(
+            Child,
+            { someProp: 3 },
+            'c3'
+        ),
+        React.createElement(
+            Child,
+            { someProp: 4 },
+            'c4'
+        )
+    ), document.getElementById('main'));
 };
 
 },{"react":463,"react-dom":325}]},{},[464]);
