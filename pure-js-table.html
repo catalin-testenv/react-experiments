@@ -27,7 +27,7 @@
         for (let row = 0; row < rowsNum; row++) {
             let map = {};
             for (let col = 0; col < colsNum; col++) {
-                map[`col-${row}-${col}-${c}`] = `val-${row}-${col}-${c}`;
+                map['col-'+col] = 'val-'+row+'-'+col+'-'+c;
             }
             tableData.push(map);
             c++;
@@ -42,11 +42,10 @@
         newTable.style.tableLayout = 'fixed';
         newTable.style.width = '100%';
         document.querySelector('#main').innerHTML = '';
-        document.querySelector('#main').appendChild(newTable);
+
         for (let i = 0; i < tableData.length; i++) {
             let rowData = tableData[i];
             let newRow = document.createElement('tr');
-            newTable.appendChild(newRow);
             let tdCount = 0;
             for (let key in rowData) {
                 let textNode = document.createTextNode(rowData[key] + ' ' + tdCount + '/' + i);
@@ -60,7 +59,9 @@
                 newRow.appendChild(newCell);
                 tdCount++;
             }
+            newTable.appendChild(newRow);
         }
+        document.querySelector('#main').appendChild(newTable);
         let end = new Date();
         console.log('createTableHtml took: ', end - start);
     }

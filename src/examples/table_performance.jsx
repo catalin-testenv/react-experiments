@@ -9,7 +9,7 @@ function generateTableData(rowsNum, colsNum) {
     for (let row = 0; row < rowsNum; row++) {
         let map = {};
         for (let col = 0; col < colsNum; col++) {
-            map[`col-${row}-${col}-${c}`] = `val-${row}-${col}-${c}`;
+            map['col-'+col] = 'val-'+row+'-'+col+'-'+c;
         }
         tableData.push(map);
         c++;
