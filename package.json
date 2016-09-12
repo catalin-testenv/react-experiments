@@ -14,17 +14,20 @@
     "react-dom": "15.0.2"
   },
   "devDependencies": {
-    "react-addons-test-utils": "15.0.2",
     "babel-cli": "6.7.7",
     "babel-core": "6.7.7",
+    "babel-plugin-transform-es2015-classes": "6.8.0",
     "babel-polyfill": "6.7.4",
     "babel-preset-es2015": "6.6.0",
     "babel-preset-react": "6.5.0",
     "babel-preset-stage-0": "6.5.0",
-    "babel-plugin-transform-es2015-classes": "6.8.0",
     "babelify": "7.3.0",
     "browserify": "13.0.0",
-    "http-server": "latest"
+    "envify": "3.4.1",
+    "http-server": "latest",
+    "react-addons-test-utils": "15.0.2",
+    "uglify-js": "2.7.3",
+    "uglifyify": "3.0.2"
   },
   "browserify": {
     "transform": [
@@ -32,7 +35,8 @@
     ]
   },
   "scripts": {
-    "build": "browserify --extension=.jsx -o dist/bundle.js src/app.jsx",
+    "build-dev": "browserify --extension=.jsx -o dist/bundle.js src/app.jsx",
+    "build-prod": "set NODE_ENV=production&& browserify --extension=.jsx -t [ envify purge --NODE_ENV production ] src/app.jsx | uglifyjs --compress=unused,dead_code -o dist/bundle.js",
     "serve": "node node_modules/http-server/bin/http-server -a 0.0.0.0 -p 8001 -c-1"
   }
 }
